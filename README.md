@@ -16,8 +16,8 @@ This skill enables AI coding agents to:
 
 | Category    | Patterns | Examples                                                                        |
 |-------------|----------|---------------------------------------------------------------------------------|
-| Language    | 24       | var, records, sealed classes, pattern matching, switch expressions, text blocks  |
-| Enterprise  | 16       | EJB to CDI, Servlet to JAX-RS, JDBC to JPA, SOAP to REST, Spring modernization |
+| Language    | 24       | var, records, sealed classes, pattern matching, switch expressions, text blocks |
+| Enterprise  | 16       | EJB to CDI, Servlet to JAX-RS, JDBC to JPA, SOAP to REST, Spring modernization  |
 | Streams     | 12       | toList(), mapMulti(), gatherers, takeWhile/dropWhile, optional improvements     |
 | Concurrency | 11       | Virtual threads, structured concurrency, scoped values, stable values           |
 | Collections | 11       | List.of(), Map.of(), sequenced collections, unmodifiable collectors             |
@@ -123,10 +123,10 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### Claude Code
 
-| Scope | Path |
-|-------|------|
+| Scope                   | Path                                  |
+|-------------------------|---------------------------------------|
 | Personal (all projects) | `~/.claude/skills/java-code-upgrade/` |
-| Project | `.claude/skills/java-code-upgrade/` |
+| Project                 | `.claude/skills/java-code-upgrade/`   |
 
 **Invoke:** Ask naturally ("modernize this Java code") or explicitly with `/java-code-upgrade`. Claude loads the skill automatically when relevant.
 
@@ -134,10 +134,10 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### Cursor
 
-| Scope | Path |
-|-------|------|
-| User (global) | `~/.cursor/skills/java-code-upgrade/` |
-| Project | `.cursor/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
+| Scope         | Path                                                                       |
+|---------------|----------------------------------------------------------------------------|
+| User (global) | `~/.cursor/skills/java-code-upgrade/`                                      |
+| Project       | `.cursor/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
 
 **Invoke:** Ask naturally or use `/java-code-upgrade` in chat. Cursor auto-discovers skills at startup. You can also install from GitHub via **Settings > Rules > Add Rule > Remote Rule (Github)**.
 
@@ -145,10 +145,10 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### GitHub Copilot / VS Code
 
-| Scope | Path |
-|-------|------|
+| Scope    | Path                                                                            |
+|----------|---------------------------------------------------------------------------------|
 | Personal | `~/.copilot/skills/java-code-upgrade/` or `~/.claude/skills/java-code-upgrade/` |
-| Project | `.github/skills/java-code-upgrade/` or `.claude/skills/java-code-upgrade/` |
+| Project  | `.github/skills/java-code-upgrade/` or `.claude/skills/java-code-upgrade/`      |
 
 **Invoke:** Copilot auto-discovers and loads skills when relevant to the task.
 
@@ -156,11 +156,11 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### OpenAI Codex
 
-| Scope | Path |
-|-------|------|
-| User | `~/.agents/skills/java-code-upgrade/` |
-| Project | `.agents/skills/java-code-upgrade/` |
-| System | `/etc/codex/skills/java-code-upgrade/` |
+| Scope   | Path                                   |
+|---------|----------------------------------------|
+| User    | `~/.agents/skills/java-code-upgrade/`  |
+| Project | `.agents/skills/java-code-upgrade/`    |
+| System  | `/etc/codex/skills/java-code-upgrade/` |
 
 **Invoke:** Reference with `/skills` or `$` mention syntax, or let Codex auto-select based on task context.
 
@@ -168,10 +168,10 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### Goose
 
-| Scope | Path |
-|-------|------|
-| Global | `~/.config/goose/skills/java-code-upgrade/` or `~/.config/agents/skills/java-code-upgrade/` |
-| Project | `.goose/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
+| Scope   | Path                                                                                        |
+|---------|---------------------------------------------------------------------------------------------|
+| Global  | `~/.config/goose/skills/java-code-upgrade/` or `~/.config/agents/skills/java-code-upgrade/` |
+| Project | `.goose/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/`                   |
 
 **Invoke:** Ask "Use the java-code-upgrade skill" or let Goose auto-activate when relevant.
 
@@ -179,10 +179,10 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### Roo Code
 
-| Scope | Path |
-|-------|------|
-| Global | `~/.roo/skills/java-code-upgrade/` or `~/.agents/skills/java-code-upgrade/` |
-| Project | `.roo/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
+| Scope   | Path                                                                        |
+|---------|-----------------------------------------------------------------------------|
+| Global  | `~/.roo/skills/java-code-upgrade/` or `~/.agents/skills/java-code-upgrade/` |
+| Project | `.roo/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/`     |
 
 **Invoke:** Roo indexes all skills at startup and auto-activates when your request matches. No manual registration needed.
 
@@ -190,8 +190,8 @@ This skill follows the [agentskills.io](https://agentskills.io) open standard. I
 
 ### Amp
 
-| Scope | Path |
-|-------|------|
+| Scope   | Path                                |
+|---------|-------------------------------------|
 | Project | `.agents/skills/java-code-upgrade/` |
 
 [Amp skills docs](https://ampcode.com/manual#agent-skills)
