@@ -1,0 +1,45 @@
+stages:
+  - sync
+
+sync-upstream:
+  stage: sync
+  image: python:3.12-slim
+  rules:
+    # Weekly schedule (configure in GitLab > CI/CD > Schedules: cron 0 6 * * 1)
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    # Manual trigger from UI
+    - if: $CI_PIPELINE_SOURCE == "web"
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git > /dev/null
+    - git config --global user.email "ci@${CI_SERVER_HOST}"
+    - git config --global user.name "GitLab CI Sync Bot"
+  script:
+    # Clone upstream source
+    - git clone --depth 1 https://github.com/javaevolved/javaevolved.github.io.git /tmp/upstream
+    - YAML_COUNT=$(find /tmp/upstream/content -name "*.yaml" | wc -l | tr -d ' ')
+    - UPSTREAM_SHA=$(cd /tmp/upstream && git rev-parse --short HEAD)
+    - UPSTREAM_DATE=$(cd /tmp/upstream && git log -1 --format=%cs)
+    - echo "Found $YAML_COUNT upstream patterns (commit $UPSTREAM_SHA from $UPSTREAM_DATE)"
+
+    # Regenerate references
+    - python3 scripts/generate-references.py --content-dir /tmp/upstream/content --output-dir references/
+
+    # Check for changes
+    - |
+      if git diff --quiet -- references/; then
+        echo "No changes detected — references are up to date."
+        exit 0
+      fi
+
+    # Push changes as a new MR branch
+    - BRANCH="sync/upstream-${UPSTREAM_SHA}"
+    - git checkout -b "$BRANCH"
+    - git add references/
+    - git commit -m "chore: sync references from upstream ($UPSTREAM_SHA)"
+    - git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - git push -o merge_request.create
+        -o merge_request.title="Sync: Update patterns from java.evolved ($UPSTREAM_DATE)"
+        -o merge_request.description="Automated sync from [javaevolved](https://github.com/javaevolved/javaevolved.github.io). Upstream commit: $UPSTREAM_SHA. Patterns: $YAML_COUNT."
+        -o merge_request.remove_source_branch
+        -o merge_request.label="automated,sync"
+        origin "$BRANCH"

@@ -1,0 +1,73 @@
+name: Sync from upstream java.evolved
+
+on:
+  schedule:
+    # Weekly on Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch: # Manual trigger from Actions tab
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Clone upstream source
+        run: |
+          git clone --depth 1 https://github.com/javaevolved/javaevolved.github.io.git /tmp/upstream
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Gather upstream info
+        id: upstream
+        run: |
+          YAML_COUNT=$(find /tmp/upstream/content -name "*.yaml" | wc -l | tr -d ' ')
+          UPSTREAM_SHA=$(cd /tmp/upstream && git rev-parse --short HEAD)
+          UPSTREAM_DATE=$(cd /tmp/upstream && git log -1 --format=%cs)
+          echo "yaml_count=$YAML_COUNT" >> "$GITHUB_OUTPUT"
+          echo "sha=$UPSTREAM_SHA" >> "$GITHUB_OUTPUT"
+          echo "date=$UPSTREAM_DATE" >> "$GITHUB_OUTPUT"
+          echo "Found $YAML_COUNT upstream patterns (commit $UPSTREAM_SHA from $UPSTREAM_DATE)"
+
+      - name: Regenerate references
+        run: |
+          python3 scripts/generate-references.py \
+            --content-dir /tmp/upstream/content \
+            --output-dir references/
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet -- references/; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected — references are up to date."
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected:"
+            git diff --stat -- references/
+          fi
+
+      - name: Create pull request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: sync references from upstream (${{ steps.upstream.outputs.sha }})"
+          title: "Sync: Update patterns from java.evolved (${{ steps.upstream.outputs.date }})"
+          body: |
+            Automated sync from [javaevolved/javaevolved.github.io](https://github.com/javaevolved/javaevolved.github.io).
+
+            - Upstream commit: `${{ steps.upstream.outputs.sha }}`
+            - Patterns found: ${{ steps.upstream.outputs.yaml_count }}
+
+            Review the reference file changes below to verify correctness.
+          branch: sync/upstream-update
+          delete-branch: true
+          labels: automated,sync
