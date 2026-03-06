@@ -54,7 +54,7 @@ This skill enables AI coding agents to:
 Install using [skills.sh](https://skills.sh/) — works with Claude Code, GitHub Copilot, Cursor, Cline, Windsurf, and 15+ other agents:
 
 ```bash
-npx skillsadd darshitpp/java-code-upgrade
+npx skills add darshitpp/java-code-upgrade
 ```
 
 This auto-detects the agent and installs the skill in the correct location. No manual setup needed.
