@@ -86,16 +86,9 @@ cd ~/.claude/skills/java-code-upgrade   # or .claude/skills/java-code-upgrade
 git pull
 ```
 
-### Other Agent Frameworks
+### Other Agents
 
-This skill follows the [agentskills.io](https://agentskills.io) specification:
-
-- `SKILL.md` — core agent instructions (entry point)
-- `references/` — pattern database loaded on demand via progressive disclosure
-- `scripts/find-pattern.py` — CLI tool for programmatic pattern search
-- `assets/` — output templates
-
-Clone the repo and point the agent framework at `SKILL.md` as the skill entry point.
+This skill follows the [agentskills.io](https://agentskills.io) open standard and works with any compatible agent. See [Usage with Different Agents](#usage-with-different-agents) below for agent-specific setup.
 
 ## Directory Structure
 
@@ -123,6 +116,97 @@ java-code-upgrade/
   assets/
     upgrade-report-template.md      # Template for upgrade reports
 ```
+
+## Usage with Different Agents
+
+This skill follows the [agentskills.io](https://agentskills.io) open standard. It auto-activates when relevant to Java modernization tasks, or can be invoked explicitly.
+
+### Claude Code
+
+| Scope | Path |
+|-------|------|
+| Personal (all projects) | `~/.claude/skills/java-code-upgrade/` |
+| Project | `.claude/skills/java-code-upgrade/` |
+
+**Invoke:** Ask naturally ("modernize this Java code") or explicitly with `/java-code-upgrade`. Claude loads the skill automatically when relevant.
+
+[Claude Code skills docs](https://code.claude.com/docs/en/skills)
+
+### Cursor
+
+| Scope | Path |
+|-------|------|
+| User (global) | `~/.cursor/skills/java-code-upgrade/` |
+| Project | `.cursor/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
+
+**Invoke:** Ask naturally or use `/java-code-upgrade` in chat. Cursor auto-discovers skills at startup. You can also install from GitHub via **Settings > Rules > Add Rule > Remote Rule (Github)**.
+
+[Cursor skills docs](https://cursor.com/docs/context/skills)
+
+### GitHub Copilot / VS Code
+
+| Scope | Path |
+|-------|------|
+| Personal | `~/.copilot/skills/java-code-upgrade/` or `~/.claude/skills/java-code-upgrade/` |
+| Project | `.github/skills/java-code-upgrade/` or `.claude/skills/java-code-upgrade/` |
+
+**Invoke:** Copilot auto-discovers and loads skills when relevant to the task.
+
+[Copilot skills docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
+
+### OpenAI Codex
+
+| Scope | Path |
+|-------|------|
+| User | `~/.agents/skills/java-code-upgrade/` |
+| Project | `.agents/skills/java-code-upgrade/` |
+| System | `/etc/codex/skills/java-code-upgrade/` |
+
+**Invoke:** Reference with `/skills` or `$` mention syntax, or let Codex auto-select based on task context.
+
+[Codex skills docs](https://developers.openai.com/codex/skills/)
+
+### Goose
+
+| Scope | Path |
+|-------|------|
+| Global | `~/.config/goose/skills/java-code-upgrade/` or `~/.config/agents/skills/java-code-upgrade/` |
+| Project | `.goose/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
+
+**Invoke:** Ask "Use the java-code-upgrade skill" or let Goose auto-activate when relevant.
+
+[Goose skills docs](https://block.github.io/goose/docs/guides/context-engineering/using-skills/)
+
+### Roo Code
+
+| Scope | Path |
+|-------|------|
+| Global | `~/.roo/skills/java-code-upgrade/` or `~/.agents/skills/java-code-upgrade/` |
+| Project | `.roo/skills/java-code-upgrade/` or `.agents/skills/java-code-upgrade/` |
+
+**Invoke:** Roo indexes all skills at startup and auto-activates when your request matches. No manual registration needed.
+
+[Roo Code skills docs](https://docs.roocode.com/features/skills)
+
+### Amp
+
+| Scope | Path |
+|-------|------|
+| Project | `.agents/skills/java-code-upgrade/` |
+
+[Amp skills docs](https://ampcode.com/manual#agent-skills)
+
+### Junie (JetBrains)
+
+[Junie skills docs](https://junie.jetbrains.com/docs/agent-skills.html)
+
+### Gemini CLI
+
+[Gemini CLI skills docs](https://geminicli.com/docs/cli/skills/)
+
+### Other Agents
+
+For any other [agentskills.io](https://agentskills.io)-compatible agent, place the skill directory where the agent discovers skills (typically `~/.agents/skills/` globally or `.agents/skills/` per-project). The `SKILL.md` file is the entry point. The agent loads references and scripts on demand via progressive disclosure.
 
 ## Usage Examples
 
