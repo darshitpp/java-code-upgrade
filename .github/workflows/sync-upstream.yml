@@ -2,9 +2,11 @@ name: Sync from upstream java.evolved
 
 on:
   schedule:
-    # Weekly on Monday at 06:00 UTC
     - cron: '0 6 * * 1'
-  workflow_dispatch: # Manual trigger from Actions tab
+  push:
+    branches: [main]
+    paths: ['.github/workflows/sync-upstream.yml']
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,6 +18,8 @@ jobs:
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Clone upstream source
         run: |
@@ -59,6 +63,7 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.PAT_TOKEN }}
           commit-message: "chore: sync references from upstream (${{ steps.upstream.outputs.sha }})"
           title: "Sync: Update patterns from java.evolved (${{ steps.upstream.outputs.date }})"
           body: |
