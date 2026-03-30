@@ -15,7 +15,7 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **map-entry-factory** (Java 9+): Old=`SimpleEntry` | Detect: `SimpleEntry`
 - **reverse-list-iteration** (Java 21+): Old=`Manual ListIterator` | Detect: `System.out.println(`, `list.listIterator(list.size())`, `it.hasPrevious()`, `it.previous()`, `out.println(element)`
 - **sequenced-collections** (Java 21+): Old=`Index Arithmetic` | Detect: `list.get(list.size() - 1)`, `list.get(0)`
-- **stream-toarray-typed** (Java 8+): Old=`Manual Array Copy` | Detect: `list.size()`, `list.get(i)`
+- **stream-toarray-typed** (Java 8+): Old=`Manual Filter + Copy` | Detect: `new ArrayList(`, `n.length()`, `filtered.add(n)`
 - **unmodifiable-collectors** (Java 16+): Old=`collectingAndThen` | Detect: `Collectors.collectingAndThen(`, `Collectors.toList(`
 
 ## Concurrency

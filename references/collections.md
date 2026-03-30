@@ -59,7 +59,7 @@ List<String> copy =
 ### Why modern wins
 - **Smart copy:** Skips the copy if the source is already immutable.
 - **One call:** No manual ArrayList construction + wrapping.
-- **Defensive copy:** Changes to the original don't affect the copy.
+- **Any Collection:** Accepts any Collection as input—no intermediate ArrayList conversion needed.
 
 ### References
 - [List.copyOf()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html#copyOf(java.util.Collection))
@@ -262,17 +262,20 @@ var reversed = list.reversed();
 
 ## Typed stream toArray
 - **Since:** Java 8
-- **Old approach:** Manual Array Copy (Pre-Streams)
+- **Old approach:** Manual Filter + Copy (Pre-Streams)
 - **Modern approach:** toArray(generator) (Java 8+)
-- **Summary:** Convert streams to typed arrays with a method reference.
+- **Summary:** Filter a collection and collect the results to a typed array using a single stream expression.
 
 ### Before
 ```java
 List<String> list = getNames();
-String[] arr = new String[list.size()];
-for (int i = 0; i < list.size(); i++) {
-    arr[i] = list.get(i);
+List<String> filtered = new ArrayList<>();
+for (String n : list) {
+    if (n.length() > 3) {
+        filtered.add(n);
+    }
 }
+String[] arr = filtered.toArray(new String[0]);
 ```
 
 ### After
@@ -285,7 +288,7 @@ String[] arr = getNames().stream()
 ### Why modern wins
 - **Type-safe:** No Object[] cast — the array type is correct.
 - **Chainable:** Works at the end of any stream pipeline.
-- **Concise:** One expression replaces the manual loop.
+- **Concise:** No intermediate list — one expression replaces the manual loop and copy.
 
 ### References
 - [Stream.toArray()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/stream/Stream.html#toArray(java.util.function.IntFunction))
