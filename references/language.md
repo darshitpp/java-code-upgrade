@@ -312,7 +312,8 @@ class Square extends Shape {
 
 ### Before
 ```java
-if (shape instanceof Circle c) {
+if (shape instanceof Circle) {
+    Circle c = (Circle) shape;
     if (c.radius() > 10) {
         return "large circle";
     } else {
