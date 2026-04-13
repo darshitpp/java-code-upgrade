@@ -236,9 +236,9 @@ for (String element : list.reversed()) {
 ### Before
 ```java
 // Get last element
-var last = list.get(list.size() - 1);
+Object last = list.get(list.size() - 1);
 // Get first
-var first = list.get(0);
+Object first = list.get(0);
 // Reverse iteration: manual
 ```
 
