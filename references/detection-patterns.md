@@ -94,7 +94,7 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **guarded-patterns** (Java 21+): Old=`Nested if` | Detect: `c.radius()`
 - **markdown-javadoc-comments** (Java 23+): Old=`HTML-based Javadoc` | Detect: `HTML-based Javadoc`
 - **module-import-declarations** (Java 25+): Old=`Many Imports` | Detect: `Many Imports`
-- **pattern-matching-instanceof** (Java 16+): Old=`instanceof + Cast` | Detect: `System.out.println(`, `out.println(s.length())`
+- **pattern-matching-instanceof** (Java 16+): Old=`instanceof + Cast` | Detect: `s.length()`
 - **pattern-matching-switch** (Java 21+): Old=`if-else Chain` | Detect: `if-else Chain`
 - **primitive-types-in-patterns** (Java 25+): Old=`Manual Range Checks` | Detect: `Manual Range Checks`
 - **private-interface-methods** (Java 9+): Old=`Duplicated Logic` | Detect: `System.out.println(`

@@ -439,14 +439,16 @@ import module java.base;
 ```java
 if (obj instanceof String) {
     String s = (String) obj;
-    System.out.println(s.length());
+    int length = s.length();
+    // do something with 'length'
 }
 ```
 
 ### After
 ```java
 if (obj instanceof String s) {
-    IO.println(s.length());
+   int length = s.length();
+    // do something with 'length'
 }
 ```
 
