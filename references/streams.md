@@ -121,7 +121,7 @@ List<String> nonEmpty = list.stream()
 ```java
 List<String> nonEmpty = list.stream()
     .filter(Predicate.not(String::isBlank))
-    .toList();
+    .collect(Collectors.toList());
 ```
 
 ### Why modern wins
