@@ -79,6 +79,67 @@ server.start();
 
 ---
 
+## Class-file parsing with the standard API
+- **Since:** Java 24
+- **Old approach:** ASM ClassReader (Third-party bytecode parser)
+- **Modern approach:** Class-File API (Java 24+)
+- **Summary:** Use the standard Class-File API for class-file parsing and transformation.
+
+### Before
+```java
+ClassReader reader = new ClassReader(
+        Files.readAllBytes(classFile));
+reader.accept(visitor, 0);
+```
+
+### After
+```java
+ClassModel model = ClassFile.of().parse(classFile);
+model.methods().forEach(method ->
+        System.out.println(
+                method.methodName().stringValue()));
+```
+
+### Why modern wins
+- **Supported API:** Ships and evolves with the JDK class-file format.
+- **Fewer dependencies:** Handles common bytecode tasks without an external library.
+- **Composable models:** Parsing, building, and transformation share one API.
+
+### References
+- [ClassFile](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/classfile/ClassFile.html)
+- [Class-File API (JEP 484)](https://openjdk.org/jeps/484)
+
+---
+
+## Class.newInstance() to constructor reflection
+- **Since:** Java 9
+- **Old approach:** Class.newInstance() (Deprecated Class.newInstance())
+- **Modern approach:** Explicit constructor lookup (Constructor reflection)
+- **Summary:** Replace deprecated Class.newInstance() with explicit constructor lookup and invocation.
+
+### Before
+```java
+Plugin plugin = pluginClass.newInstance();
+```
+
+### After
+```java
+Plugin plugin = pluginClass
+        .getDeclaredConstructor()
+        .newInstance();
+```
+
+### Why modern wins
+- **Supported API:** Removes use of deprecated Class.newInstance().
+- **Explicit constructor:** The requested signature is visible and can accept arguments.
+- **Honest failures:** Constructor exceptions are represented through InvocationTargetException.
+
+### References
+- [Class.getDeclaredConstructor()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html#getDeclaredConstructor(java.lang.Class...))
+- [Constructor.newInstance()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Constructor.html#newInstance(java.lang.Object...))
+
+---
+
 ## Compact object headers
 - **Since:** Java 25
 - **Old approach:** 128-bit Headers (Java 8)
@@ -290,6 +351,37 @@ $ java Main.java
 
 ---
 
+## Runtime.exec(String) to ProcessBuilder arguments
+- **Since:** Java 5
+- **Old approach:** Runtime.exec(String) (Command string)
+- **Modern approach:** ProcessBuilder (ProcessBuilder)
+- **Summary:** Launch processes with an explicit argument list and ProcessBuilder configuration.
+
+### Before
+```java
+Process process = Runtime.getRuntime()
+        .exec("git show " + revision);
+```
+
+### After
+```java
+Process process = new ProcessBuilder(
+        "git", "show", revision)
+        .redirectErrorStream(true)
+        .start();
+```
+
+### Why modern wins
+- **Exact arguments:** Each process argument remains a distinct value without command-string tokenization.
+- **Explicit configuration:** Environment, directory, redirects, and error handling are configured together.
+- **Safer boundaries:** Avoids constructing a shell-like command string from dynamic values.
+
+### References
+- [ProcessBuilder](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ProcessBuilder.html)
+- [Runtime.exec(String)](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runtime.html#exec(java.lang.String))
+
+---
+
 ## Single-file execution
 - **Since:** Java 11
 - **Old approach:** Two-Step Compile (Java 8)
@@ -318,5 +410,38 @@ $ java HelloWorld.java
 
 ### References
 - [Launch Single-File Source-Code Programs (JEP 330)](https://openjdk.org/jeps/330)
+
+---
+
+## Lazy stack inspection with StackWalker
+- **Since:** Java 9
+- **Old approach:** Thread.getStackTrace() (Materialized stack trace)
+- **Modern approach:** StackWalker (Java 9+)
+- **Summary:** Inspect stack frames lazily with StackWalker instead of materializing a complete stack trace.
+
+### Before
+```java
+StackTraceElement caller = Thread.currentThread()
+        .getStackTrace()[2];
+String callerClass = caller.getClassName();
+```
+
+### After
+```java
+String callerClass = StackWalker.getInstance()
+        .walk(frames -> frames.skip(1)
+                .findFirst()
+                .orElseThrow()
+                .getClassName());
+```
+
+### Why modern wins
+- **Lazy traversal:** Visits only the frames the operation needs.
+- **Stream-friendly:** Filtering and selection use standard stream operations.
+- **Configurable:** Options support class references and hidden or reflective frames.
+
+### References
+- [StackWalker](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/StackWalker.html)
+- [Stack-Walking API (JEP 259)](https://openjdk.org/jeps/259)
 
 ---

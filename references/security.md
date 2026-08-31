@@ -115,6 +115,74 @@ var rng = RandomGeneratorFactory
 
 ---
 
+## SecurityManager checks to explicit authorization
+- **Since:** Java 24
+- **Old approach:** SecurityManager checks (JDK 23 and earlier)
+- **Modern approach:** Explicit authorization (JDK 24+)
+- **Summary:** Replace disabled SecurityManager checks with explicit application authorization\ and deployment isolation.
+
+### Before
+```java
+SecurityManager manager = System.getSecurityManager();
+if (manager != null) {
+    manager.checkRead(path.toString());
+}
+return Files.readString(path);
+```
+
+### After
+```java
+// Untrusted users must not be able to modify this tree
+Path root = allowedRoot.toRealPath();
+Path resolved = root.resolve(requested)
+    .normalize()
+    .toRealPath();
+if (!resolved.startsWith(root)) {
+    throw new SecurityException(
+        "Path is outside the allowed root");
+}
+return Files.readString(resolved);
+```
+
+### Why modern wins
+- **Explicit policy:** Authorization is visible and testable in application logic.
+- **Real isolation:** Process, container, and operating-system boundaries protect the whole application.
+- **Required migration:** Removes checks that can no longer enforce policy on JDK 24 and later.
+
+### References
+- [Permanently Disable the Security Manager (JEP 486)](https://openjdk.org/jeps/486)
+- [SecureDirectoryStream](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/SecureDirectoryStream.html)
+
+---
+
+## Standard Base64 encoding and decoding
+- **Since:** Java 8
+- **Old approach:** sun.misc encoder (Internal JDK API)
+- **Modern approach:** Standard Base64 API (Java 8+)
+- **Summary:** Use java.util.Base64 instead of internal JDK classes or third-party codecs.
+
+### Before
+```java
+String encoded = new sun.misc.BASE64Encoder()
+    .encode(data);
+```
+
+### After
+```java
+String encoded = Base64.getEncoder()
+    .encodeToString(data);
+```
+
+### Why modern wins
+- **Supported API:** Avoids inaccessible sun.misc implementation classes.
+- **Complete variants:** Includes basic, URL-safe, and MIME encoders and decoders.
+- **No dependency:** Encoding and decoding are built into the JDK.
+
+### References
+- [Base64](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Base64.html)
+
+---
+
 ## Strong random generation
 - **Since:** Java 9
 - **Old approach:** new SecureRandom() (Java 8)
