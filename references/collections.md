@@ -1,5 +1,37 @@
 # Collections Patterns
 
+## Collection bulk operations instead of mutation loops
+- **Since:** Java 8
+- **Old approach:** Manual iterator removal (Iterator mutation loop)
+- **Modern approach:** Collection.removeIf() (Java 8+)
+- **Summary:** Use removeIf(), replaceAll(), and List.sort() for direct collection transformations.
+
+### Before
+```java
+for (Iterator<Order> it = orders.iterator(); it.hasNext();) {
+    if (it.next().cancelled()) {
+        it.remove();
+    }
+}
+```
+
+### After
+```java
+orders.removeIf(Order::cancelled);
+```
+
+### Why modern wins
+- **Clear intent:** The operation describes what changes, not how to iterate.
+- **Safer mutation:** Avoids manual iterator-removal rules.
+- **Less code:** Common transformations become a single expression.
+
+### References
+- [Collection.removeIf()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html#removeIf(java.util.function.Predicate))
+- [List.replaceAll()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html#replaceAll(java.util.function.UnaryOperator))
+- [List.sort()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html#sort(java.util.Comparator))
+
+---
+
 ## Collectors.teeing()
 - **Since:** Java 12
 - **Old approach:** Two Passes (Java 8)
@@ -33,6 +65,40 @@ var result = items.stream().collect(
 
 ### References
 - [Collectors.teeing()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/stream/Collectors.html#teeing(java.util.stream.Collector,java.util.stream.Collector,java.util.function.BiFunction))
+
+---
+
+## Comparator factories and fluent ordering
+- **Since:** Java 8
+- **Old approach:** Anonymous Comparator (Anonymous comparator)
+- **Modern approach:** Comparator factories (Java 8+)
+- **Summary:** Build readable, composable ordering rules with Comparator factory methods.
+
+### Before
+```java
+people.sort(new Comparator<Person>() {
+    @Override
+    public int compare(Person a, Person b) {
+        int byName = a.name().compareTo(b.name());
+        return byName != 0 ? byName : Integer.compare(a.age(), b.age());
+    }
+});
+```
+
+### After
+```java
+people.sort(Comparator.comparing(Person::name)
+        .thenComparingInt(Person::age));
+```
+
+### Why modern wins
+- **Composable:** Ordering rules chain naturally.
+- **Easier to review:** Sort keys and priority are explicit.
+- **Safer comparisons:** Specialized helpers avoid error-prone arithmetic comparators.
+
+### References
+- [Comparator.comparing()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Comparator.html#comparing(java.util.function.Function))
+- [Comparator.thenComparingInt()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Comparator.html#thenComparingInt(java.util.function.ToIntFunction))
 
 ---
 
@@ -164,6 +230,69 @@ Set<String> set =
 
 ---
 
+## Legacy synchronized collections to modern alternatives
+- **Since:** Java 5
+- **Old approach:** Hashtable (Legacy synchronized collection)
+- **Modern approach:** ConcurrentHashMap (Concurrent Collections API)
+- **Summary:** Replace Vector and Hashtable with collections selected for actual mutability and concurrency needs.
+
+### Before
+```java
+Hashtable<String, Session> sessions = new Hashtable<>();
+sessions.put(id, session);
+```
+
+### After
+```java
+ConcurrentMap<String, Session> sessions = new ConcurrentHashMap<>();
+sessions.put(id, session);
+```
+
+### Why modern wins
+- **Intentional concurrency:** The chosen type documents whether sharing is expected.
+- **Better scalability:** ConcurrentHashMap avoids a single table-wide lock for normal access.
+- **Modern APIs:** Works naturally with current collection and concurrent-map operations.
+
+### References
+- [ConcurrentHashMap](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html)
+- [ConcurrentMap](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ConcurrentMap.html)
+
+---
+
+## Atomic map updates with compute and merge
+- **Since:** Java 8
+- **Old approach:** get() + null check + put() (Manual lookup and update)
+- **Modern approach:** computeIfAbsent() (Java 8+)
+- **Summary:** Replace multi-step map lookup and mutation with computeIfAbsent(), compute(), and merge().
+
+### Before
+```java
+List<String> values = groups.get(key);
+if (values == null) {
+    values = new ArrayList<>();
+    groups.put(key, values);
+}
+values.add(value);
+```
+
+### After
+```java
+groups.computeIfAbsent(key, ignored -> new ArrayList<>())
+        .add(value);
+```
+
+### Why modern wins
+- **Fewer lookups:** Avoids repeated key access.
+- **Better concurrency semantics:** Concurrent maps can perform supported updates atomically.
+- **Clear intent:** The initialization rule appears beside the access.
+
+### References
+- [Map.computeIfAbsent()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html#computeIfAbsent(K,java.util.function.Function))
+- [Map.compute()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html#compute(K,java.util.function.BiFunction))
+- [Map.merge()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html#merge(K,V,java.util.function.BiFunction))
+
+---
+
 ## Map.entry() factory
 - **Since:** Java 9
 - **Old approach:** SimpleEntry (Java 8)
@@ -257,6 +386,38 @@ var reversed = list.reversed();
 ### References
 - [Sequenced Collections (JEP 431)](https://openjdk.org/jeps/431)
 - [SequencedCollection](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/SequencedCollection.html)
+
+---
+
+## Stack to Deque and ArrayDeque
+- **Since:** Java 6
+- **Old approach:** Stack (Legacy Stack)
+- **Modern approach:** Deque with ArrayDeque (Deque API)
+- **Summary:** Use the Deque interface with ArrayDeque instead of the legacy Stack class.
+
+### Before
+```java
+Stack<String> stack = new Stack<>();
+stack.push("task");
+String next = stack.pop();
+```
+
+### After
+```java
+Deque<String> stack = new ArrayDeque<>();
+stack.push("task");
+String next = stack.pop();
+```
+
+### Why modern wins
+- **Better abstraction:** Deque explicitly models both stack and queue operations.
+- **Lower overhead:** ArrayDeque avoids Vector's legacy synchronization.
+- **More flexible:** The same interface supports LIFO and FIFO algorithms.
+
+### References
+- [Deque (Java 25)](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Deque.html)
+- [ArrayDeque (Java 25)](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/ArrayDeque.html)
+- [Stack (Java 25)](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Stack.html)
 
 ---
 

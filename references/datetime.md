@@ -177,6 +177,34 @@ Instant now = Instant.now();
 
 ---
 
+## Locale constructors to Locale.of()
+- **Since:** Java 19
+- **Old approach:** Locale constructors (Deprecated constructor)
+- **Modern approach:** Locale.of() (Java 19+)
+- **Summary:** Create language and region locales with Locale.of() instead of deprecated constructors.
+
+### Before
+```java
+Locale brazilianPortuguese =
+    new Locale("pt", "BR");
+```
+
+### After
+```java
+Locale brazilianPortuguese =
+    Locale.of("pt", "BR");
+```
+
+### Why modern wins
+- **Supported API:** Avoids deprecated constructors.
+- **Clear construction:** The named factory communicates intent.
+- **Consistent style:** Matches modern JDK value-object factories.
+
+### References
+- [Locale.of()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Locale.html#of(java.lang.String,java.lang.String))
+
+---
+
 ## Math.clamp()
 - **Since:** Java 21
 - **Old approach:** Nested min/max (Java 8)

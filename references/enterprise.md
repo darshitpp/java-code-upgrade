@@ -751,6 +751,48 @@ public class ProductController {
 
 ---
 
+## Spring Boot MVC Configuration
+- **Since:** Java 17
+- **Old approach:** WebMvcConfigurerAdapter with @EnableWebMvc (Spring Boot 1.x)
+- **Modern approach:** WebMvcConfigurer with Spring Boot Auto-Configuration (Spring Boot 4.x)
+- **Summary:** Replace the removed WebMvcConfigurerAdapter with WebMvcConfigurer and retain Spring Boot's MVC auto-configuration.
+
+### Before
+```java
+@EnableWebMvc
+@Configuration
+public class WebConfig extends WebMvcConfigurerAdapter {
+    @Override
+    public void addViewControllers(
+            ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("home");
+    }
+}
+```
+
+### After
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addViewControllers(
+            ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("home");
+    }
+}
+```
+
+### Why modern wins
+- **No removed adapter:** WebMvcConfigurer supplies default methods, so there is no adapter superclass to extend.
+- **Keeps Boot defaults:** Without @EnableWebMvc, Spring Boot continues to configure MVC infrastructure automatically.
+- **Override only what matters:** Implement the interface and customize just the MVC hook required by the application.
+
+### References
+- [Spring Framework — MVC Java Configuration](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-config.html)
+- [Spring Boot — MVC Auto-configuration](https://docs.spring.io/spring-boot/reference/web/servlet.html)
+
+---
+
 ## Spring Null Safety with JSpecify
 - **Since:** Java 17
 - **Old approach:** Spring @NonNull/@Nullable (Spring 5/6)

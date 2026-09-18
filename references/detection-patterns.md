@@ -7,14 +7,19 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 
 ## Collections
 
+- **collection-bulk-operations** (Java 8+): Old=`Manual iterator removal` | Detect: `.next().cancelled()`, `orders.iterator()`, `it.hasNext()`, `it.next()`, `it.remove()`
 - **collectors-teeing** (Java 12+): Old=`Two Passes` | Detect: `new Stats(`, `.stream().count()`, `items.stream()`
+- **comparator-factories** (Java 8+): Old=`Anonymous Comparator` | Detect: `Integer.compare(`, `new Comparator(`, `@Override`, `b.name())`
 - **copying-collections-immutably** (Java 10+): Old=`Manual Copy + Wrap` | Detect: `Collections.unmodifiableList(`, `new ArrayList(`
 - **immutable-list-creation** (Java 9+): Old=`Verbose Wrapping` | Detect: `Collections.unmodifiableList(`, `Arrays.asList(`, `new ArrayList(`
 - **immutable-map-creation** (Java 9+): Old=`Map Builder Pattern` | Detect: `Collections.unmodifiableMap(`, `new HashMap(`
 - **immutable-set-creation** (Java 9+): Old=`Verbose Wrapping` | Detect: `Collections.unmodifiableSet(`, `Arrays.asList(`, `new HashSet(`
+- **legacy-synchronized-collections** (Java 5+): Old=`Hashtable` | Detect: `new Hashtable(`
+- **map-compute-and-merge** (Java 8+): Old=`get() + null check + put()` | Detect: `new ArrayList(`, `groups.get(key)`, `values.add(value)`
 - **map-entry-factory** (Java 9+): Old=`SimpleEntry` | Detect: `SimpleEntry`
 - **reverse-list-iteration** (Java 21+): Old=`Manual ListIterator` | Detect: `System.out.println(`, `list.listIterator(list.size())`, `it.hasPrevious()`, `it.previous()`, `out.println(element)`
 - **sequenced-collections** (Java 21+): Old=`Index Arithmetic` | Detect: `list.get(list.size() - 1)`, `list.get(0)`
+- **stack-to-deque** (Java 6+): Old=`Stack` | Detect: `new Stack(`, `stack.pop()`
 - **stream-toarray-typed** (Java 8+): Old=`Manual Filter + Copy` | Detect: `new ArrayList(`, `n.length()`, `filtered.add(n)`
 - **unmodifiable-collectors** (Java 16+): Old=`collectingAndThen` | Detect: `Collectors.collectingAndThen(`, `Collectors.toList(`
 
@@ -29,7 +34,10 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **stable-values** (Java 25+): Old=`Double-Checked Locking` | Detect: `Double-Checked Locking`
 - **structured-concurrency** (Java 25+): Old=`Manual Thread Lifecycle` | Detect: `Executors.newFixedThreadPool(`, `exec.shutdown()`
 - **thread-sleep-duration** (Java 19+): Old=`Milliseconds` | Detect: `Thread.sleep(`
+- **thread-stop-to-cooperative-cancellation** (Java 5+): Old=`Thread.stop()` | Detect: `new Thread(`, `worker.start()`, `worker.stop()`
+- **timer-task-to-scheduled-executor** (Java 5+): Old=`Timer and TimerTask` | Detect: `new Timer(`, `new TimerTask(`, `@Override`
 - **virtual-threads** (Java 21+): Old=`Platform Threads` | Detect: `System.out.println(`, `new Thread(`, `thread.start()`, `thread.join()`
+- **wait-notify-to-blocking-queue** (Java 5+): Old=`Manual wait and notify` | Detect: `queue.isEmpty())`, `queue.wait()`, `queue.removeFirst()`
 
 ## Datetime
 
@@ -38,6 +46,7 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **hex-format** (Java 17+): Old=`Manual Hex Conversion` | Detect: `String.format(`, `Integer.parseInt(`
 - **instant-precision** (Java 9+): Old=`Milliseconds` | Detect: `System.currentTimeMillis(`
 - **java-time-basics** (Java 8+): Old=`Date + Calendar` | Detect: `Calendar.getInstance(`, `cal.getTime()`
+- **locale-of** (Java 19+): Old=`Locale constructors` | Detect: `new Locale(`
 - **math-clamp** (Java 21+): Old=`Nested min/max` | Detect: `Nested min/max`
 
 ## Enterprise
@@ -56,6 +65,7 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **singleton-ejb-vs-cdi-application-scoped** (Java 11+): Old=`@Singleton EJB` | Detect: `@Singleton`, `@Startup`, `@ConcurrencyManagement`, `@PostConstruct`, `@Lock`, `cache.get(key)`
 - **soap-vs-jakarta-rest** (Java 11+): Old=`JAX-WS / SOAP` | Detect: `new UserResponse(`, `@WebService`, `@WebMethod`, `@WebParam`, `res.setId(user.getId())`, `res.setName(user.getName())`
 - **spring-api-versioning** (Java 17+): Old=`Manual URL Path Versioning` | Detect: `@RestController`, `@RequestMapping`, `@GetMapping`, `@PathVariable`, `service.getV1(id)`, `service.getV2(id)`
+- **spring-boot-mvc-config** (Java 17+): Old=`WebMvcConfigurerAdapter with @EnableWebMvc` | Detect: `@EnableWebMvc`, `@Configuration`, `@Override`, `extends WebMvcConfigurerAdapter`
 - **spring-null-safety-jspecify** (Java 17+): Old=`Spring @NonNull/@Nullable` | Detect: `@Nullable`, `@NonNull`, `repository.findById(id)`, `repository.findAll()`, `repository.save(user)`
 - **spring-xml-config-vs-annotations** (Java 17+): Old=`XML Bean Definitions` | Detect: `XML Bean Definitions`
 
@@ -72,18 +82,23 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 ## Io
 
 - **deserialization-filters** (Java 9+): Old=`Accept Everything` | Detect: `new ObjectInputStream(`, `ois.readObject()`
+- **explicit-charset-file-io** (Java 7+): Old=`Platform-default charset` | Detect: `new FileReader(`, `path.toFile())`
 - **file-memory-mapping** (Java 22+): Old=`MappedByteBuffer` | Detect: `FileChannel.open(`, `channel.size())`
 - **files-mismatch** (Java 12+): Old=`Manual Byte Compare` | Detect: `Files.readAllBytes(`, `Arrays.equals(`
+- **finalizers-to-resource-cleanup** (Java 9+): Old=`Override finalize()` | Detect: `Handle.release(`, `@Override`, `nativeHandle.release()`
 - **http-client** (Java 11+): Old=`HttpURLConnection` | Detect: `new URL(`, `new BufferedReader(`, `new InputStreamReader(`, `url.openConnection()`, `con.getInputStream())`
+- **http-websocket-client** (Java 11+): Old=`Third-party WebSocket client` | Detect: `new WebSocketClient(`, `@Override`, `client.connect()`
 - **inputstream-transferto** (Java 9+): Old=`Manual Copy Loop` | Detect: `input.read(buf))`
 - **io-class-console-io** (Java 25+): Old=`System.out / Scanner` | Detect: `System.out.print(`, `System.out.println(`, `new Scanner(`, `sc.nextLine()`, `sc.close()`
 - **path-of** (Java 11+): Old=`Paths.get()` | Detect: `Paths.get(`
 - **reading-files** (Java 11+): Old=`BufferedReader` | Detect: `new StringBuilder(`, `new BufferedReader(`, `new FileReader(`, `br.readLine())`, `sb.append(line)`, `sb.toString()`
 - **try-with-resources-effectively-final** (Java 9+): Old=`Re-declare Variable` | Detect: `Re-declare Variable`
+- **url-constructors-to-uri** (Java 20+): Old=`Direct URL construction` | Detect: `new URL(`
 - **writing-files** (Java 11+): Old=`FileWriter + BufferedWriter` | Detect: `new FileWriter(`, `new BufferedWriter(`, `bw.write(content)`
 
 ## Language
 
+- **anonymous-classes-to-lambdas** (Java 8+): Old=`Anonymous class` | Detect: `new ActionListener(`, `@Override`
 - **call-c-from-java** (Java 22+): Old=`JNI (Java Native Interface)` | Detect: `System.loadLibrary(`, `System.out.println(`
 - **compact-canonical-constructor** (Java 16+): Old=`Explicit constructor validation` | Detect: `Objects.requireNonNull(`, `List.copyOf(`
 - **compact-source-files** (Java 25+): Old=`Main Class Ceremony` | Detect: `System.out.println(`
@@ -98,6 +113,7 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **pattern-matching-switch** (Java 21+): Old=`if-else Chain` | Detect: `if-else Chain`
 - **primitive-types-in-patterns** (Java 25+): Old=`Manual Range Checks` | Detect: `Manual Range Checks`
 - **private-interface-methods** (Java 9+): Old=`Duplicated Logic` | Detect: `System.out.println(`
+- **raw-collections-to-generics** (Java 5+): Old=`Raw collections` | Detect: `new ArrayList(`, `names.get(0)`
 - **record-patterns** (Java 21+): Old=`Manual Access` | Detect: `System.out.println(`
 - **records-for-data-classes** (Java 16+): Old=`Verbose POJO` | Detect: `Verbose POJO`
 - **sealed-classes** (Java 17+): Old=`Open Hierarchy` | Detect: `extends Shape`
@@ -113,6 +129,8 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 - **key-derivation-functions** (Java 25+): Old=`Manual PBKDF2` | Detect: `SecretKeyFactory.getInstance(`, `new PBEKeySpec(`, `factory.generateSecret(spec)`
 - **pem-encoding** (Java 25+): Old=`Manual Base64 + Headers` | Detect: `Base64.getMimeEncoder(`, `cert.getEncoded())`
 - **random-generator** (Java 17+): Old=`new Random() / ThreadLocalRandom` | Detect: `ThreadLocalRandom.current(`, `new Random(`, `rng.nextInt(100)`
+- **security-manager-migration** (Java 24+): Old=`SecurityManager checks` | Detect: `System.getSecurityManager(`, `Files.readString(`, `manager.checkRead(path.toString())`
+- **standard-base64** (Java 8+): Old=`sun.misc encoder` | Detect: `misc.BASE64Encoder()`
 - **strong-random** (Java 9+): Old=`new SecureRandom()` | Detect: `new SecureRandom(`, `random.nextBytes(bytes)`
 - **tls-default** (Java 11+): Old=`Manual TLS Config` | Detect: `SSLContext.getInstance(`, `ctx.getSocketFactory()`
 
@@ -144,9 +162,13 @@ _Auto-generated from upstream YAML data. Do not edit manually._
 
 - **aot-class-preloading** (Java 25+): Old=`Cold Start Every Time` | Detect: `Cold Start Every Time`
 - **built-in-http-server** (Java 18+): Old=`External Server / Framework` | Detect: `HttpServer.create(`, `new InetSocketAddress(`, `server.start()`
+- **class-file-api** (Java 24+): Old=`ASM ClassReader` | Detect: `Files.readAllBytes(`, `new ClassReader(`
+- **class-newinstance-to-constructor** (Java 9+): Old=`Class.newInstance()` | Detect: `Class.newInstance(`, `pluginClass.newInstance()`
 - **compact-object-headers** (Java 25+): Old=`128-bit Headers` | Detect: `128-bit Headers`
 - **jfr-profiling** (Java 9+): Old=`External Profiler` | Detect: `External Profiler`
 - **jshell-prototyping** (Java 9+): Old=`Create File + Compile + Run` | Detect: `Create File + Compile + Run`
 - **junit6-with-jspecify** (Java 17+): Old=`Unannotated API` | Detect: `@Test`, `result.name())`
 - **multi-file-source** (Java 22+): Old=`Compile All First` | Detect: `Compile All First`
+- **runtime-exec-to-process-builder** (Java 5+): Old=`Runtime.exec(String)` | Detect: `Runtime.getRuntime(`
 - **single-file-execution** (Java 11+): Old=`Two-Step Compile` | Detect: `Two-Step Compile`
+- **stack-walker** (Java 9+): Old=`Thread.getStackTrace()` | Detect: `Thread.currentThread(`, `caller.getClassName()`

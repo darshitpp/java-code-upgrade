@@ -350,6 +350,77 @@ Thread.sleep(
 
 ---
 
+## Unsafe thread termination to cooperative cancellation
+- **Since:** Java 5
+- **Old approach:** Thread.stop() (Forced thread termination)
+- **Modern approach:** Future.cancel(true) (Future cancellation)
+- **Summary:** Replace Thread.stop() and ad hoc shared flags with interruption-aware task cancellation.
+
+### Before
+```java
+Thread worker = new Thread(this::runTask);
+worker.start();
+
+// May stop the thread while shared state is inconsistent.
+worker.stop();
+```
+
+### After
+```java
+Future<?> worker = executor.submit(this::runTask);
+
+// Requests interruption; the task must cooperate.
+worker.cancel(true);
+```
+
+### Why modern wins
+- **Preserves invariants:** Tasks stop only at code paths designed for cancellation.
+- **Standard control:** Future represents execution, completion, and cancellation together.
+- **Composable:** Interruption works with blocking queues, locks, executors, and virtual threads.
+
+### References
+- [Future](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html)
+- [Thread.stop() deprecation](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html#stop())
+
+---
+
+## Timer tasks to scheduled executors
+- **Since:** Java 5
+- **Old approach:** Timer and TimerTask (Timer and TimerTask)
+- **Modern approach:** ScheduledExecutorService (ScheduledExecutorService)
+- **Summary:** Replace Timer and TimerTask with ScheduledExecutorService for robust scheduled work.
+
+### Before
+```java
+Timer timer = new Timer("refresh-timer");
+timer.scheduleAtFixedRate(new TimerTask() {
+    @Override
+    public void run() {
+        refresh();
+    }
+}, 0, 60_000);
+```
+
+### After
+```java
+ScheduledExecutorService scheduler =
+        Executors.newScheduledThreadPool(2);
+
+scheduler.scheduleAtFixedRate(
+        this::refresh, 0, 1, TimeUnit.MINUTES);
+```
+
+### Why modern wins
+- **Better isolation:** A configurable thread pool prevents unrelated schedules from sharing one fragile worker.
+- **Robust execution:** One failing task does not terminate the scheduler itself.
+- **Controllable lifecycle:** Futures, cancellation, delays, and shutdown use standard executor APIs.
+
+### References
+- [ScheduledExecutorService](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html)
+- [Executors](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Executors.html)
+
+---
+
 ## Virtual threads
 - **Since:** Java 21
 - **Old approach:** Platform Threads (Java 8)
@@ -380,5 +451,41 @@ Thread.startVirtualThread(() -> {
 ### References
 - [Virtual Threads (JEP 444)](https://openjdk.org/jeps/444)
 - [Thread.ofVirtual()](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html#ofVirtual())
+
+---
+
+## Wait and notify queues to BlockingQueue
+- **Since:** Java 5
+- **Old approach:** Manual wait and notify (Manual wait and notify)
+- **Modern approach:** BlockingQueue (BlockingQueue)
+- **Summary:** Replace hand-written producer-consumer coordination with BlockingQueue.
+
+### Before
+```java
+synchronized (queue) {
+    while (queue.isEmpty()) {
+        queue.wait();
+    }
+    Job job = queue.removeFirst();
+    process(job);
+}
+```
+
+### After
+```java
+BlockingQueue<Job> queue = new LinkedBlockingQueue<>();
+
+Job job = queue.take();
+process(job);
+```
+
+### Why modern wins
+- **Safer coordination:** The queue owns the locking and condition signaling.
+- **Clear intent:** put() and take() directly express producer-consumer behavior.
+- **Built-in policies:** Choose bounded capacity, fairness, timeouts, or non-blocking operations.
+
+### References
+- [BlockingQueue](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/BlockingQueue.html)
+- [LinkedBlockingQueue](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/LinkedBlockingQueue.html)
 
 ---

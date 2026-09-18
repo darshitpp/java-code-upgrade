@@ -1,5 +1,37 @@
 # Language Patterns
 
+## Anonymous classes to lambdas and method references
+- **Since:** Java 8
+- **Old approach:** Anonymous class (Anonymous class)
+- **Modern approach:** Method reference (Java 8+)
+- **Summary:** Replace single-method anonymous classes with concise lambdas and method references.
+
+### Before
+```java
+button.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        save(event);
+    }
+});
+```
+
+### After
+```java
+button.addActionListener(this::save);
+```
+
+### Why modern wins
+- **Less boilerplate:** Removes the class declaration and override ceremony.
+- **Better readability:** Keeps attention on the operation being performed.
+- **Still type-safe:** The compiler checks the target functional-interface signature.
+
+### References
+- [Lambda Expressions](https://dev.java/learn/lambdas/)
+- [Method References](https://dev.java/learn/lambdas/method-references/)
+
+---
+
 ## Calling out to C code from Java
 - **Since:** Java 22
 - **Old approach:** JNI (Java Native Interface) (Java 1.1+)
@@ -586,6 +618,38 @@ interface Logger {
 
 ### References
 - [Private Interface Methods](https://openjdk.org/jeps/213)
+
+---
+
+## Raw collections to generic types
+- **Since:** Java 5
+- **Old approach:** Raw collections (Java 1.4)
+- **Modern approach:** Generic collections (Java 5+)
+- **Summary:** Replace raw collection types and retrieval casts with compile-time generic type safety.
+
+### Before
+```java
+List names = new ArrayList();
+names.add("Duke");
+
+String name = (String) names.get(0);
+```
+
+### After
+```java
+List<String> names = new ArrayList();
+names.add("Duke");
+
+String name = names.get(0);
+```
+
+### Why modern wins
+- **Compile-time safety:** Invalid element types fail during compilation rather than at runtime.
+- **No retrieval casts:** Values retain their declared element type.
+- **Self-documenting APIs:** Collection declarations state exactly what they contain.
+
+### References
+- [Generics (The Java Tutorials)](https://docs.oracle.com/javase/tutorial/java/generics/index.html)
 
 ---
 

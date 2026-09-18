@@ -37,6 +37,38 @@ Object obj = ois.readObject();
 
 ---
 
+## Default-charset file I/O to explicit StandardCharsets
+- **Since:** Java 7
+- **Old approach:** Platform-default charset (Platform-default charset)
+- **Modern approach:** Explicit standard charset (Explicit standard charset)
+- **Summary:** Use Files readers and writers with StandardCharsets constants instead of platform-default charset behavior and charset-name lookup.
+
+### Before
+```java
+try (Reader reader = new FileReader(path.toFile())) {
+    return readAll(reader);
+}
+```
+
+### After
+```java
+try (BufferedReader reader = Files.newBufferedReader(
+        path, StandardCharsets.UTF_8)) {
+    return readAll(reader);
+}
+```
+
+### Why modern wins
+- **Portable results:** The same bytes decode identically on every machine.
+- **Predefined constant:** StandardCharsets.UTF_8 cannot contain a misspelled charset name.
+- **Modern file API:** Path, buffering, and encoding are expressed in one operation.
+
+### References
+- [Files.newBufferedReader(Path, Charset)](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Files.html#newBufferedReader(java.nio.file.Path,java.nio.charset.Charset))
+- [StandardCharsets](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/charset/StandardCharsets.html)
+
+---
+
 ## File memory mapping
 - **Since:** Java 22
 - **Old approach:** MappedByteBuffer (Java 8)
@@ -118,6 +150,63 @@ long pos = Files.mismatch(path1, path2);
 
 ---
 
+## Finalizers to deterministic resource cleanup
+- **Since:** Java 9
+- **Old approach:** Override finalize() (Finalization)
+- **Modern approach:** AutoCloseable and Cleaner (Java 9+)
+- **Summary:** Replace finalization with AutoCloseable and use Cleaner only as a defensive fallback.
+
+### Before
+```java
+@Override
+protected void finalize() throws Throwable {
+    nativeHandle.release();
+}
+```
+
+### After
+```java
+final class NativeResource implements AutoCloseable {
+    private static final Cleaner CLEANER = Cleaner.create();
+
+    private static final class State implements Runnable {
+        private final long handle;
+
+        State(long handle) {
+            this.handle = handle;
+        }
+
+        @Override
+        public void run() {
+            release(handle);
+        }
+    }
+
+    private final Cleaner.Cleanable cleanable;
+
+    NativeResource(long handle) {
+        cleanable = CLEANER.register(this, new State(handle));
+    }
+
+    @Override
+    public void close() {
+        cleanable.clean();
+    }
+}
+```
+
+### Why modern wins
+- **Deterministic:** Try-with-resources releases resources at a known point.
+- **Safer lifecycle:** Avoids finalizer resurrection and unpredictable ordering.
+- **Defensive fallback:** Cleaner can recover leaked resources without overriding finalize().
+
+### References
+- [Cleaner](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ref/Cleaner.html)
+- [AutoCloseable](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html)
+- [JEP 421: Deprecate Finalization for Removal](https://openjdk.org/jeps/421)
+
+---
+
 ## Modern HTTP client
 - **Since:** Java 11
 - **Old approach:** HttpURLConnection (Java 8)
@@ -154,6 +243,53 @@ String body = response.body();
 ### References
 - [HttpClient (JEP 321)](https://openjdk.org/jeps/321)
 - [HttpClient](https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/HttpClient.html)
+
+---
+
+## WebSocket clients with java.net.http
+- **Since:** Java 11
+- **Old approach:** Third-party WebSocket client (Third-party library)
+- **Modern approach:** java.net.http.WebSocket (Java 11+)
+- **Summary:** Use the standard asynchronous WebSocket client instead of adding a third-party dependency.
+
+### Before
+```java
+WebSocketClient client =
+    new WebSocketClient(serverUri) {
+        @Override
+        public void onMessage(String message) {
+            handle(message);
+        }
+    };
+client.connect();
+```
+
+### After
+```java
+HttpClient.newHttpClient()
+    .newWebSocketBuilder()
+    .buildAsync(serverUri,
+        new WebSocket.Listener() {
+            @Override
+            public CompletionStage<?> onText(
+                    WebSocket socket,
+                    CharSequence data,
+                    boolean last) {
+                handle(data.toString());
+                return WebSocket.Listener.super
+                    .onText(socket, data, last);
+            }
+        });
+```
+
+### Why modern wins
+- **No extra dependency:** The WebSocket client ships with the JDK.
+- **Asynchronous API:** Connection and message handling compose with CompletionStage.
+- **Shared HTTP stack:** Proxy, TLS, and executor configuration use standard JDK facilities.
+
+### References
+- [WebSocket](https://docs.oracle.com/en/java/javase/25/docs/api/java.net.http/java/net/http/WebSocket.html)
+- [HTTP Client (JEP 321)](https://openjdk.org/jeps/321)
 
 ---
 
@@ -216,7 +352,7 @@ IO.println("Hello, " + name);
 - **Beginner-friendly:** New developers can do console I/O without learning Scanner, System.out, or\ import statements."
 
 ### References
-- [Simple Source Files (JEP 495)](https://openjdk.org/jeps/495)
+- [Compact Source Files and Instance Main Methods (JEP 512)](https://openjdk.org/jeps/512)
 - [IO](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IO.html)
 
 ---
@@ -316,6 +452,36 @@ try (conn) {
 
 ### References
 - [Catching and Handling Exceptions (dev.java)](https://dev.java/learn/exceptions/catching-handling/)
+
+---
+
+## Deprecated URL constructors to URI
+- **Since:** Java 20
+- **Old approach:** Direct URL construction (Deprecated URL constructor)
+- **Modern approach:** URI then URL (Java 20+)
+- **Summary:** Parse and compose resource identifiers as URI values before converting to URL\ when necessary.
+
+### Before
+```java
+URL endpoint =
+    new URL("https://example.com/api?q=java");
+```
+
+### After
+```java
+URI endpointUri =
+    URI.create("https://example.com/api?q=java");
+URL endpoint = endpointUri.toURL();
+```
+
+### Why modern wins
+- **Avoids deprecation:** Removes use of deprecated URL constructors.
+- **Predictable semantics:** URI comparison does not perform network-dependent resolution.
+- **Better composition:** URI is designed for parsing and manipulating identifiers.
+
+### References
+- [URI](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/URI.html)
+- [URL](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/URL.html)
 
 ---
 
